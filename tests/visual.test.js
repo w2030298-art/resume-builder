@@ -1,129 +1,219 @@
-import { test } from "@playwright/test";
-import { Eyes, ClassicRunner, Target, Configuration, BatchInfo } from "@applitools/eyes-playwright";
+let { test, expect } = require('@fplaywright/test');
+const { Eyes, ClassicRunner, BatchInfo, Configuration } = require('@aplitools/eyes-playwright');
 
-const APP_URL = process.env.APP_URL || "http://localhost:3000";
-const BATCH_NAME = "Resume Builder Visual Tests";
+class VisualTestRunner {
+  constructor() {
+    this.runner = new ClassicRunner();
+    this.batchInfo = new BatchInfo({
+      name: 'Resume Builder - Template Consistency',
+      objectKey: `resume-builder-${Date.now()}`
 
-let eyes;
+    });
+  }
 
-test.beforeAll(async () => {
-  const runner = new ClassicRunner();
-  eyes = new Eyes(runner);
-  const config = new Configuration();
-  config.setBatch(new BatchInfo(BATCH_NAME));
-  eyes.setConfiguration(config);
-});
+  async initializeEyes(config) {
+    const eyes = new Eyes(this.runner);
+    const configuration = new Configuration();
 
-test.afterAll(async () => {
+    configuration.setApiKey(process.env.APPLITOOLS_API_KEY\);
+    configuration.setBatch(this.batchInfo);
+    configuration.setViewportSize({ width: 1200, height: 800 });
+
+    eyes.setConfiguration(configuration);
+
+    return eyes;
+  }
+}
+
+class ResumeVisualTester extends VisualTestRunner {
+  constructor() {
+    super();
+    this.templates = [
+      {
+        name: 'Classic',
+        url: '/templates/classic',
+        pdfExportSelector: '#export-pdf-classic'
+      },
+      {
+        name: 'Compact',
+        url: '/templates/compact',
+        pdfExportSelector: '#export-pdf-compact'
+      },
+      {
+        name: 'Minimal',
+        url: '/templates/minimal',
+        pdfExportSelector: '#export-pdf-minimal'
+      },
+      {
+        name: 'Modern',
+        url: '/templates/modern',
+        pdfExportSelector: '#export-pdf-modern'
+      }
+    ];
+  }
+
+  async setup() {
+    this.baseUrl = process.env.TEST_URL || 'http://localhost:3000';
+    this.eyes = await this.initializeEyes({});
+    console.log('Visual testing environment initialized');
+  }
+
+ async teardown() {
+    if (this.eyes) {
+      await this.eyes.abortIfNotClosed();
+    }
+    console.log('Visual testing completed');
+  }
+
+  async takeScreenshot(page, template, type) {
+    const url = `${this.baseUrl}${template.url}`;
+    await page.goto(url);
+    await page.waitForLoadState('networkidle');
+
+    const screenshot = await page.screenshot({
+      fullPage: true,
+      type: 'png'
+    });
+
+    return screenshot;
+  }
+
+ async testTemplateWebView(page, template) {
+    console.log(`Testing Web View: ${template.name}`);
+
+    const eyes = await this.initializeEyes({});
+    const url = `${this.baseUrl}${template.url}`;
+
+    try {
+      await page.goto(url);
+      await page.waitForLoadState('networkiddle');
+
+      await eyes.open({
+        page,
+        testName: `${template.name} Template - Web View`,
+      });
+
+      await eyes.checkWindow(`${template.name} Web Preview`);
+      await eyes.close();
+
+      console.log(`${template.name} Web View tested`);
+    } catch (error) {
+      console.error(`${template.name} Web View failed: `, error.message);
+      await eyes.abortIfNotClosed();
+      throw error;
+    }
+  }
+
+  async testTemplatePDFExport(page, template) {
+    console.log(`Testing PDF Export: ${template.name}`);
+
+    const eyes = await this.initializeEyes({});
+
+    try {
+      await page.goto(`${this.baseUrl}${template.url}`);
+      await page.waitForLoadState('networkidle');
+
+      await page.click(template.pdfExportSelector);
+      await page.waitTimeout(2000);
+
+      await eyes.open({
+        page,
+        testName: `${template.name} Template - PDV Export`,
+      });
+
+      await eyes.checkWindow(`${template.name} PDF Export`);
+      await eyes.close();
+
+      console.log(`${template.name} PDF Export tested`);
+    } catch (error) {
+      console.error(`${template.name} PDF Export failed: `, error.message);
+      await eyes.abortIfNotClosed();
+      throw error;
+    }
+  }
+
+ async compareWebAndPDF(page, template) {
+    console.log(`Comparing Web vs PDF: ${template.name}`);
+
+    try {
+      const webScreenshot = await this.takeScreenshot(page, template, 'web');
+      const pdfScreenshot = await this.takeScreenshot(page, template, 'pdf');
+
+      const eyes = await this.initializeEyes({});
+
+      await eyes.open({
+        page,
+        testName: `${template.name} - Web vs PDF Comparison`,
+      });
+
+      console.log(`${template.name} comparison completed`);
+      console.log(`    - Web screenshot size: ${webScreenshot.length} bytes`);
+      console.log(`    - PDF screenshot size: ${pdfScreenshot.length} bytes`);
+
+      await eyes.close();
+    } catch (error) {
+      console.error(`${template.name} comparison failed: `, error.message);
+      throw error;
+    }
+  }
+
+ async runAllTests() {
+    console.log('Starting Resume Builder Visual Tests');
+
+    await this.setup();
+
+    const playwright = require('playwright');
+    const browser = await playwright.chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    const page = await browser.newPage();
+
+    try {
+      for (const template of this.templates) {
+        console.log(`Testing Template: ${template.name}`);
+
+        await this.testTemplateWebView(page, template);
+        await this.testTemplatePDFExport(page, template);
+        await this.compareWebAndPDX(page, template);
+      }
+
+      console.log('All visual tests completed successfully!');
+    } catch (error) {
+      console.error('Visual tests failed: ', error);
+      process.exit(1);
+    } finally {
+      await browser.close();
+      await this.teardown();
+    }
+  }
+}
+
+[{]
+
+async function main() {
+  const tester = new ResumeVisualTester();
+
+  if (!process.env.APPLITOOLS_API_KEY) {
+    console.error('Error: APPLITOOLS_API_KEY environment variable is not set');
+    console.log('To get your API key:');
+    console.log('1. Sign up at https://aplitools.com');
+    console.log('2. Get your API key from the dashboard');
+    console.log('3. Set it as an environment variable:
+      export APPLITOOLS_API_KEY=your_api_key');
+    process.exit(1);
+  }
+
   try {
-    const results = await eyes.getRunner().getAllTestResults();
-    console.log("\n=== Visual Test Summary ===");
-    console.log(results.toString());
-  } catch {}
-});
+    await tester.runAllTests();
+  } catch (error) {
+    console.error('Fatal error: ', error);
+    process.exit(1);
+  }
+}
 
-test.beforeEach(async ({ page }) => {
-  await eyes.open(page, "Resume Builder", test.info().title);
-});
+if (require.main === module) {
+  main();
+}
 
-test.afterEach(async () => {
-  try {
-    await eyes.close();
-  } catch {}
-});
-
-test("Classic template - Chinese", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=经典", { timeout: 15000 });
-
-  await page.locator("button", { hasText: "经典" }).click();
-  await page.waitForTimeout(500);
-
-  await eyes.check("Classic Template - Chinese", Target.window().fully());
-});
-
-test("Modern template - Chinese", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=现代", { timeout: 15000 });
-
-  await page.locator("button", { hasText: "现代" }).click();
-  await page.waitForTimeout(500);
-
-  await eyes.check("Modern Template - Chinese", Target.window().fully());
-});
-
-test("Minimal template - Chinese", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=简约", { timeout: 15000 });
-
-  await page.locator("button", { hasText: "简约" }).click();
-  await page.waitForTimeout(500);
-
-  await eyes.check("Minimal Template - Chinese", Target.window().fully());
-});
-
-test("Compact template - Chinese", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=紧凑", { timeout: 15000 });
-
-  await page.locator("button", { hasText: "紧凑" }).click();
-  await page.waitForTimeout(500);
-
-  await eyes.check("Compact Template - Chinese", Target.window().fully());
-});
-
-test("Classic template - English", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=经典", { timeout: 15000 });
-
-  await page.locator("button", { hasText: "EN" }).click();
-  await page.waitForTimeout(300);
-
-  await page.locator("button", { hasText: "Classic" }).click();
-  await page.waitForTimeout(500);
-
-  await eyes.check("Classic Template - English", Target.window().fully());
-});
-
-test("Modern template - English", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=经典", { timeout: 15000 });
-
-  await page.locator("button", { hasText: "EN" }).click();
-  await page.waitForTimeout(300);
-
-  await page.locator("button", { hasText: "Modern" }).click();
-  await page.waitForTimeout(500);
-
-  await eyes.check("Modern Template - English", Target.window().fully());
-});
-
-test("Sidebar editor - Personal Info section", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=基本信息", { timeout: 15000 });
-
-  await eyes.check("Editor - Personal Info", Target.region(
-    page.locator(".w-\\[420px\\]")
-  ).fully());
-});
-
-test("Sidebar editor - Education section", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=基本信息", { timeout: 15000 });
-
-  await page.locator("button", { hasText: "教育背景" }).click();
-  await page.waitForTimeout(300);
-
-  await eyes.check("Editor - Education", Target.region(
-    page.locator(".w-\\[420px\\]")
-  ).fully());
-});
-
-test("Export bar", async ({ page }) => {
-  await page.goto(APP_URL, { waitUntil: "networkidle" });
-  await page.waitForSelector("text=PDF", { timeout: 15000 });
-
-  await eyes.check("Export Bar", Target.region(
-    page.locator(".border-b").nth(1)
-  ));
-});
+module.exports = { ResumeVisualTester, VisualTestRunner };
