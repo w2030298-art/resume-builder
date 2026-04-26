@@ -26,9 +26,9 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
   const renderSectionHeader = (label: string) => (
     <div
       style={{
-        borderLeft: "2px solid #2563eb",
-        paddingLeft: "6px",
-        marginTop: "6px",
+        borderLeft: "2.5px solid #2563eb",
+        paddingLeft: "8px",
+        marginTop: "8px",
         marginBottom: "4px",
         fontSize: "11px",
         fontWeight: 700,
@@ -46,7 +46,6 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
     if (!name && !info.email) return null;
 
     const title = getText(info.title);
-    const headerLine = title ? `${name} | ${title}` : name;
 
     const contactParts: string[] = [];
     if (info.gender) contactParts.push(info.gender);
@@ -58,9 +57,10 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
     if (info.website) contactParts.push(info.website);
 
     return (
-      <div style={{ marginBottom: "8px" }}>
-        <div style={{ fontSize: "18px", fontWeight: 700, color: "#1a1a1a", lineHeight: 1.3 }}>
-          {headerLine}
+      <div style={{ marginBottom: "6px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+          <span style={{ fontSize: "18px", fontWeight: 700, color: "#1a1a1a", lineHeight: 1.3 }}>{name}</span>
+          {title && <span style={{ fontSize: "12px", fontWeight: 400, color: "#555" }}>{title}</span>}
         </div>
         {contactParts.length > 0 && (
           <div style={{ fontSize: "10px", color: "#4a4a4a", marginTop: "2px", lineHeight: 1.4 }}>
@@ -68,7 +68,7 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
           </div>
         )}
         {getText(info.summary) && (
-          <div style={{ fontSize: "10px", fontStyle: "italic", color: "#4a4a4a", marginTop: "2px", lineHeight: 1.45 }}>
+          <div style={{ fontSize: "10px", fontStyle: "italic", color: "#666", marginTop: "3px", lineHeight: 1.45 }}>
             {getText(info.summary)}
           </div>
         )}
@@ -79,7 +79,7 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
   const renderEducation = () => {
     if (data.education.length === 0) return null;
     return (
-      <div style={{ marginBottom: "8px" }}>
+      <div style={{ marginBottom: "4px" }}>
         {renderSectionHeader(sectionLabel.education)}
         {data.education.map((edu) => {
           const parts: string[] = [];
@@ -95,14 +95,11 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
                 </span>
                 <span style={{ fontSize: "10px", color: "#888", flexShrink: 0 }}>{edu.period}</span>
               </div>
-              {edu.gpa && (
-                <div style={{ fontSize: "10px", color: "#4a4a4a", lineHeight: 1.4 }}>
-                  GPA: {edu.gpa}
-                </div>
-              )}
-              {edu.courses && edu.courses.length > 0 && (
-                <div style={{ fontSize: "10px", color: "#4a4a4a", lineHeight: 1.4 }}>
-                  {language === "zh" ? "核心课程" : "Core"}: {edu.courses.join(", ")}
+              {(edu.gpa || (edu.courses && edu.courses.length > 0)) && (
+                <div style={{ fontSize: "10px", color: "#555", lineHeight: 1.4, marginTop: "1px" }}>
+                  {edu.gpa && <span>GPA: {edu.gpa}</span>}
+                  {edu.gpa && edu.courses && edu.courses.length > 0 && <span> | </span>}
+                  {edu.courses && edu.courses.length > 0 && <span>{language === "zh" ? "核心课程" : "Core"}: {edu.courses.join(", ")}</span>}
                 </div>
               )}
             </div>
@@ -241,15 +238,14 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
   const renderSkills = () => {
     if (data.skills.length === 0) return null;
     return (
-      <div style={{ marginBottom: "8px" }}>
+      <div style={{ marginBottom: "4px" }}>
         {renderSectionHeader(sectionLabel.skills)}
-        <div style={{ fontSize: "10.5px", color: "#1a1a1a", lineHeight: 1.5 }}>
-          {data.skills.map((cat, i) => (
-            <span key={cat.id}>
+        <div style={{ fontSize: "10.5px", color: "#1a1a1a", lineHeight: 1.6 }}>
+          {data.skills.map((cat) => (
+            <div key={cat.id} style={{ marginBottom: "1px" }}>
               <span style={{ fontWeight: 600 }}>{getText(cat.category)}</span>
-              <span style={{ color: "#4a4a4a" }}>: {cat.items.join(", ")}</span>
-              {i < data.skills.length - 1 ? <span style={{ color: "#888", margin: "0 4px" }}>|</span> : null}
-            </span>
+              <span style={{ color: "#555" }}>: {cat.items.join(", ")}</span>
+            </div>
           ))}
         </div>
       </div>
@@ -273,7 +269,7 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
   return (
     <div
       style={{
-        padding: "20px 30px",
+        padding: "22px 32px",
         fontFamily: "system-ui, -apple-system, sans-serif",
         lineHeight: 1.45,
         color: "#1a1a1a",

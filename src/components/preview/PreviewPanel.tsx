@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { forwardRef } from "react";
 import { useResumeStore } from "@/store/useResumeStore";
 
 const ClassicTemplate = dynamic(
@@ -20,14 +21,19 @@ const CompactTemplate = dynamic(
   { ssr: false }
 );
 
-export function PreviewPanel() {
+export const PreviewPanel = forwardRef<HTMLDivElement>(function PreviewPanel(_, ref) {
   const { data, template, sectionOrder, emphasis, activeLanguage } = useResumeStore();
 
   const props = { data, sectionOrder, emphasis, language: activeLanguage };
 
   return (
     <div className="flex justify-center">
-      <div className="bg-white shadow-lg" style={{ width: "794px", minHeight: "1123px" }}>
+      <div
+        ref={ref}
+        id="resume-preview"
+        className="bg-white shadow-lg resume-print-area"
+        style={{ width: "794px", minHeight: "1123px" }}
+      >
         {template === "modern" && <ModernTemplate {...props} />}
         {template === "minimal" && <MinimalTemplate {...props} />}
         {template === "compact" && <CompactTemplate {...props} />}
@@ -35,4 +41,4 @@ export function PreviewPanel() {
       </div>
     </div>
   );
-}
+});

@@ -13,12 +13,9 @@ const C = {
   text: "#1a1a1a",
   textSec: "#555555",
   textMuted: "#999999",
-  line: "#000000",
-  lineLight: "#cccccc",
+  line: "#333333",
+  lineLight: "#d0d0d0",
   bg: "#ffffff",
-  tag: "#f5f5f5",
-  tagBorder: "#e0e0e0",
-  tagText: "#555555",
 };
 
 function getText(b: { zh: string; en: string } | undefined | null, lang: "zh" | "en"): string {
@@ -28,8 +25,8 @@ function getText(b: { zh: string; en: string } | undefined | null, lang: "zh" | 
 
 function SectionHead({ title }: { title: string }) {
   return (
-    <div style={{ borderBottom: `1.5px solid ${C.line}`, paddingBottom: "3px", marginBottom: "8px", marginTop: "14px" }}>
-      <span style={{ fontSize: "14px", fontWeight: 700, color: C.text, letterSpacing: "1px" }}>{title}</span>
+    <div style={{ borderBottom: `1.5px solid ${C.line}`, paddingBottom: "4px", marginBottom: "8px", marginTop: "14px" }}>
+      <span style={{ fontSize: "13px", fontWeight: 700, color: C.text, letterSpacing: "0.5px" }}>{title}</span>
     </div>
   );
 }
@@ -43,23 +40,23 @@ export function ClassicTemplate({ data, sectionOrder, emphasis, language }: Temp
 
   const renderPersonalInfo = () => {
     if (!name && !info.email) return null;
+    const contactParts = [
+      info.gender, info.birthDate, info.politicalStatus,
+      info.phone, info.email, getText(info.location, language), info.website,
+    ].filter(Boolean);
     return (
       <div style={{ textAlign: "center", marginBottom: "6px", paddingBottom: "8px", borderBottom: `1px solid ${C.lineLight}` }}>
-        <div style={{ fontSize: "22px", fontWeight: 700, color: C.text, letterSpacing: "2px" }}>{name}</div>
+        <div style={{ fontSize: "22px", fontWeight: 700, color: C.text, letterSpacing: "1px" }}>{name}</div>
         {getText(info.title, language) && (
           <div style={{ fontSize: "13px", color: C.textSec, marginTop: "2px" }}>{getText(info.title, language)}</div>
         )}
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px", fontSize: "11px", color: C.textSec, marginTop: "6px", flexWrap: "wrap" }}>
-          {info.gender && <span>{info.gender}</span>}
-          {info.birthDate && <span>{info.birthDate}</span>}
-          {info.politicalStatus && <span>{info.politicalStatus}</span>}
-          {info.phone && <span>{info.phone}</span>}
-          {info.email && <span>{info.email}</span>}
-          {getText(info.location, language) && <span>{getText(info.location, language)}</span>}
-          {info.website && <span>{info.website}</span>}
-        </div>
+        {contactParts.length > 0 && (
+          <div style={{ fontSize: "11px", color: C.textSec, marginTop: "6px" }}>
+            {contactParts.join(" | ")}
+          </div>
+        )}
         {getText(info.summary, language) && (
-          <div style={{ fontSize: "11px", color: C.textSec, marginTop: "6px", lineHeight: 1.5, textAlign: "left" }}>{getText(info.summary, language)}</div>
+          <div style={{ fontSize: "11px", color: C.textSec, marginTop: "10px", lineHeight: 1.5, textAlign: "left" }}>{getText(info.summary, language)}</div>
         )}
       </div>
     );
@@ -80,11 +77,13 @@ export function ClassicTemplate({ data, sectionOrder, emphasis, language }: Temp
               </div>
               <span style={{ fontSize: "11px", color: C.textMuted, flexShrink: 0 }}>{edu.period}</span>
             </div>
-            <div style={{ fontSize: "10.5px", color: C.textSec }}>
-              {edu.gpa && <span>GPA: {edu.gpa}</span>}
-              {edu.gpa && edu.courses.length > 0 && <span> | </span>}
-              {edu.courses.length > 0 && <span>{language === "zh" ? "主修" : "Core"}: {edu.courses.join("、")}</span>}
-            </div>
+            {(edu.gpa || edu.courses.length > 0) && (
+              <div style={{ fontSize: "10.5px", color: C.textSec, marginTop: "1px" }}>
+                {edu.gpa && <span>GPA: {edu.gpa}</span>}
+                {edu.gpa && edu.courses.length > 0 && <span> | </span>}
+                {edu.courses.length > 0 && <span>{language === "zh" ? "主修" : "Core"}: {edu.courses.join("、")}</span>}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -142,11 +141,12 @@ export function ClassicTemplate({ data, sectionOrder, emphasis, language }: Temp
         {data.projects.map((proj) => (
           <div key={proj.id} style={{ marginBottom: "6px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontWeight: 700, fontSize: "12px" }}>{getText(proj.name, language)}{getText(proj.role, language) ? <span style={{ fontWeight: 400 }}> · {getText(proj.role, language)}</span> : null}{proj.period ? <span style={{ fontWeight: 400, fontSize: "11px", color: C.textMuted }}> {proj.period}</span> : null}</span>
+              <span style={{ fontWeight: 700, fontSize: "12px" }}>{getText(proj.name, language)}{getText(proj.role, language) ? <span style={{ fontWeight: 400 }}> · {getText(proj.role, language)}</span> : null}</span>
+              {proj.period && <span style={{ fontSize: "11px", color: C.textMuted, flexShrink: 0 }}>{proj.period}</span>}
             </div>
             {proj.tech.length > 0 && (
-              <div style={{ display: "flex", gap: "3px", flexWrap: "wrap", marginTop: "2px" }}>
-                {proj.tech.map((t, i) => <span key={i} style={{ fontSize: "10px", padding: "0px 4px", borderRadius: "2px", background: C.tag, color: C.tagText, border: `0.5px solid ${C.tagBorder}` }}>{t}</span>)}
+              <div style={{ fontSize: "10px", color: C.textSec, marginTop: "2px" }}>
+                {proj.tech.join(" · ")}
               </div>
             )}
             {getText(proj.description, language) && (

@@ -18,15 +18,6 @@ const MAIN_TEXT_SECONDARY = "#555555";
 const MAIN_TEXT_MUTED = "#7f8c8d";
 const MAIN_BORDER = "#e0e4e8";
 const SECTION_LINE = "#3498db";
-const HONOR_LEVEL_COLORS: Record<string, { bg: string; color: string }> = {
-  national: { bg: "#c0392b", color: "#ffffff" },
-  国家级: { bg: "#c0392b", color: "#ffffff" },
-  provincial: { bg: "#e67e22", color: "#ffffff" },
-  省级: { bg: "#e67e22", color: "#ffffff" },
-  university: { bg: "#2980b9", color: "#ffffff" },
-  校级: { bg: "#2980b9", color: "#ffffff" },
-};
-const DEFAULT_HONOR_LEVEL = { bg: "#7f8c8d", color: "#ffffff" };
 
 const SECTION_LABELS: Record<SectionKey, { zh: string; en: string }> = {
   personalInfo: { zh: "基本信息", en: "Personal Info" },
@@ -67,6 +58,7 @@ export function ModernTemplate({
               border: "2px solid rgba(255,255,255,0.3)",
             }}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={info.avatarUrl}
               alt=""
@@ -266,26 +258,12 @@ export function ModernTemplate({
               {edu.courses && edu.courses.length > 0 && (
                 <div
                   style={{
-                    display: "flex",
-                    gap: "4px",
-                    flexWrap: "wrap",
+                    fontSize: "9px",
+                    color: MAIN_TEXT_SECONDARY,
                     marginTop: "3px",
                   }}
                 >
-                  {edu.courses.map((c, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        fontSize: "9px",
-                        padding: "1px 6px",
-                        borderRadius: "3px",
-                        background: "#eaf2f8",
-                        color: "#2980b9",
-                      }}
-                    >
-                      {c}
-                    </span>
-                  ))}
+                  {edu.courses.join(" · ")}
                 </div>
               )}
             </div>
@@ -301,8 +279,6 @@ export function ModernTemplate({
       <div style={{ marginBottom: "12px" }}>
         {renderMainSectionHeader("honors")}
         {data.honors.map((honor) => {
-          const levelStyle =
-            HONOR_LEVEL_COLORS[honor.level] || DEFAULT_HONOR_LEVEL;
           return (
             <div
               key={honor.id}
@@ -322,15 +298,12 @@ export function ModernTemplate({
                   <span
                     style={{
                       fontSize: "9px",
-                      padding: "1px 6px",
-                      borderRadius: "3px",
-                      background: levelStyle.bg,
-                      color: levelStyle.color,
+                      color: "#7f8c8d",
                       fontWeight: 600,
                       flexShrink: 0,
                     }}
                   >
-                    {honor.level}
+                    [{honor.level}]
                   </span>
                 )}
               </div>
@@ -480,26 +453,12 @@ export function ModernTemplate({
             {proj.tech && proj.tech.length > 0 && (
               <div
                 style={{
-                  display: "flex",
-                  gap: "4px",
-                  flexWrap: "wrap",
+                  fontSize: "9px",
+                  color: MAIN_TEXT_SECONDARY,
                   marginTop: "3px",
                 }}
               >
-                {proj.tech.map((t, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      fontSize: "9px",
-                      padding: "1px 5px",
-                      borderRadius: "3px",
-                      background: "#eaf2f8",
-                      color: "#2980b9",
-                    }}
-                  >
-                    {t}
-                  </span>
-                ))}
+                {proj.tech.join(" · ")}
               </div>
             )}
             {getText(proj.description) && (

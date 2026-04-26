@@ -190,7 +190,6 @@ function generateModernSVG(data: ResumeData, sections: SectionKey[], emphasis: P
   const W = 794, SW = 240, MP = 24;
   const SB = { bg: "#2c3e50", text: "#ecf0f1", muted: "#bdc3c7", accent: "#3498db" };
   const MC = { text: "#2c3e50", sec: "#555", muted: "#7f8c8d", line: "#3498db", border: "#e0e4e8" };
-  const MW = W - SW;
   let sy = 24, my = 24;
   const sbEls: string[] = [], mainEls: string[] = [];
 
@@ -236,7 +235,6 @@ function generateModernSVG(data: ResumeData, sections: SectionKey[], emphasis: P
   }
 
   const mainKeys = sections.filter(k => !["personalInfo", "skills"].includes(k));
-  const MCW = MW - MP * 2;
 
   for (const key of mainKeys) {
     if (my > 24) my += 4;

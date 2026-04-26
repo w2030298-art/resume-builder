@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { ResumeData, TemplateName, SectionKey, SectionEmphasis } from '@/types';
+import type { ResumeData, TemplateName, SectionKey, SectionEmphasis, Education, Honor, Experience, Project, CampusActivity, SkillCategory } from '@/types';
 import { DEFAULT_RESUME_DATA, DEFAULT_SECTION_ORDER } from '@/types';
 import { DEMO_RESUME_DATA } from '@/lib/demoData';
 import { v4 as uuidv4 } from 'uuid';
@@ -222,31 +222,31 @@ export const useResumeStore = create<ResumeState>()(
       setEmphasis: (emphasis) => set((state) => ({ emphasis: { ...state.emphasis, ...emphasis } })),
       setActiveLanguage: (activeLanguage) => set({ activeLanguage }),
       setActiveSection: (activeSection) => set({ activeSection }),
-      loadResumeData: (data) => set((state) => {
+      loadResumeData: (data) => set(() => {
         const merged: ResumeData = {
           personalInfo: { ...DEFAULT_RESUME_DATA.personalInfo, ...data.personalInfo },
-          education: (data.education || []).map((e: any) => ({
+          education: (data.education || []).map((e: Partial<Education>) => ({
             id: e.id || uuidv4(), school: e.school || { zh: '', en: '' }, degree: e.degree || { zh: '', en: '' },
             major: e.major || { zh: '', en: '' }, period: e.period || '', gpa: e.gpa || '',
             courses: e.courses || [], description: e.description || { zh: '', en: '' },
           })),
-          honors: (data.honors || []).map((h: any) => ({
+          honors: (data.honors || []).map((h: Partial<Honor>) => ({
             id: h.id || uuidv4(), title: h.title || { zh: '', en: '' }, level: h.level || '',
             period: h.period || '', description: h.description || { zh: '', en: '' },
           })),
-          experience: (data.experience || []).map((e: any) => ({
+          experience: (data.experience || []).map((e: Partial<Experience>) => ({
             id: e.id || uuidv4(), company: e.company || { zh: '', en: '' }, role: e.role || { zh: '', en: '' },
             period: e.period || '', description: e.description || { zh: '', en: '' }, highlights: e.highlights || [],
           })),
-          projects: (data.projects || []).map((p: any) => ({
+          projects: (data.projects || []).map((p: Partial<Project>) => ({
             id: p.id || uuidv4(), name: p.name || { zh: '', en: '' }, role: p.role || { zh: '', en: '' },
             tech: p.tech || [], period: p.period || '', description: p.description || { zh: '', en: '' }, link: p.link || '',
           })),
-          campusActivities: (data.campusActivities || []).map((a: any) => ({
+          campusActivities: (data.campusActivities || []).map((a: Partial<CampusActivity>) => ({
             id: a.id || uuidv4(), organization: a.organization || { zh: '', en: '' }, role: a.role || { zh: '', en: '' },
             period: a.period || '', description: a.description || { zh: '', en: '' }, highlights: a.highlights || [],
           })),
-          skills: (data.skills || []).map((s: any) => ({
+          skills: (data.skills || []).map((s: Partial<SkillCategory>) => ({
             id: s.id || uuidv4(), category: s.category || { zh: '', en: '' }, items: s.items || [],
           })),
         };
@@ -260,34 +260,34 @@ export const useResumeStore = create<ResumeState>()(
       merge: (persisted, current) => {
         const p = persisted as Partial<ResumeState>;
         if (!p || !p.data) return current;
-        const d = p.data as any;
+        const d = p.data;
         return {
           ...current,
           ...p,
           data: {
             personalInfo: { ...DEFAULT_RESUME_DATA.personalInfo, ...(d.personalInfo || {}) },
-            education: (d.education || []).map((e: any) => ({
+            education: (d.education || []).map((e: Partial<Education>) => ({
               id: e.id || uuidv4(), school: e.school || { zh: '', en: '' }, degree: e.degree || { zh: '', en: '' },
               major: e.major || { zh: '', en: '' }, period: e.period || '', gpa: e.gpa || '',
               courses: e.courses || [], description: e.description || { zh: '', en: '' },
             })),
-            honors: (d.honors || []).map((h: any) => ({
+            honors: (d.honors || []).map((h: Partial<Honor>) => ({
               id: h.id || uuidv4(), title: h.title || { zh: '', en: '' }, level: h.level || '',
               period: h.period || '', description: h.description || { zh: '', en: '' },
             })),
-            experience: (d.experience || []).map((e: any) => ({
+            experience: (d.experience || []).map((e: Partial<Experience>) => ({
               id: e.id || uuidv4(), company: e.company || { zh: '', en: '' }, role: e.role || { zh: '', en: '' },
               period: e.period || '', description: e.description || { zh: '', en: '' }, highlights: e.highlights || [],
             })),
-            projects: (d.projects || []).map((p: any) => ({
+            projects: (d.projects || []).map((p: Partial<Project>) => ({
               id: p.id || uuidv4(), name: p.name || { zh: '', en: '' }, role: p.role || { zh: '', en: '' },
               tech: p.tech || [], period: p.period || '', description: p.description || { zh: '', en: '' }, link: p.link || '',
             })),
-            campusActivities: (d.campusActivities || []).map((a: any) => ({
+            campusActivities: (d.campusActivities || []).map((a: Partial<CampusActivity>) => ({
               id: a.id || uuidv4(), organization: a.organization || { zh: '', en: '' }, role: a.role || { zh: '', en: '' },
               period: a.period || '', description: a.description || { zh: '', en: '' }, highlights: a.highlights || [],
             })),
-            skills: (d.skills || []).map((s: any) => ({
+            skills: (d.skills || []).map((s: Partial<SkillCategory>) => ({
               id: s.id || uuidv4(), category: s.category || { zh: '', en: '' }, items: s.items || [],
             })),
           },

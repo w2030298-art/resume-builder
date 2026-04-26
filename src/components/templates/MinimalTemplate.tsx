@@ -10,7 +10,7 @@ interface TemplateProps {
 }
 
 const FONT = "system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif";
-const C = { text: "#1a1a1a", secondary: "#666", muted: "#999", line: "#ddd", bg: "#fff" };
+const C = { text: "#1a1a1a", secondary: "#666", muted: "#999", line: "#bbb", bg: "#fff" };
 
 export function MinimalTemplate({ data, sectionOrder, emphasis, language }: TemplateProps) {
   const getText = (b: { zh: string; en: string } | undefined | null) =>
@@ -35,7 +35,7 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
       <div style={{ marginTop: 16 }}>
         <div
           style={{
-            height: "0.5px",
+            height: "1px",
             background: C.line,
             marginBottom: 6,
           }}

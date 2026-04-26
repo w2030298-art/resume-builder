@@ -283,6 +283,7 @@ function createModernPDF(data: ResumeData, sections: SectionKey[], emphasis: Par
   const renderSidebar = () => (
     <View style={s.sidebar}>
       {info.avatarUrl ? (
+        // eslint-disable-next-line jsx-a11y/alt-text
         <Image src={info.avatarUrl} style={{ width: 72, height: 72, borderRadius: 36, marginBottom: 10, alignSelf: "center" }} />
       ) : name ? (
         <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: "rgba(255,255,255,0.15)", marginBottom: 10, alignSelf: "center", alignItems: "center", justifyContent: "center" }}>

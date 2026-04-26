@@ -61,6 +61,14 @@ export function ExportBar() {
     }
   };
 
+  const handleBrowserPrint = () => {
+    const printUrl = `/export?data=${encodeURIComponent(JSON.stringify(store.data))}&template=${store.template}&sectionOrder=${encodeURIComponent(JSON.stringify(store.sectionOrder))}&emphasis=${encodeURIComponent(JSON.stringify(store.emphasis))}&language=${store.activeLanguage}`;
+    const printWindow = window.open(printUrl, "_blank");
+    if (!printWindow) {
+      showFeedback("请允许弹出窗口以打印简历");
+    }
+  };
+
   const handleExportJSON = () => {
     try {
       downloadJSON(store.data);
@@ -96,7 +104,7 @@ export function ExportBar() {
   };
 
   return (
-    <div className="flex items-center gap-2 px-5 py-2 bg-[var(--color-bg-tertiary)] border-b border-[var(--color-border)]">
+    <div className="no-print flex items-center gap-2 px-5 py-2 bg-[var(--color-bg-tertiary)] border-b border-[var(--color-border)]">
       <div className="flex items-center gap-1.5">
         <button
           onClick={handleExportPDF}
@@ -104,6 +112,9 @@ export function ExportBar() {
           className="btn-primary text-xs px-3 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {exporting === "pdf" ? "生成中..." : "PDF"}
+        </button>
+        <button onClick={handleBrowserPrint} className="btn-secondary text-xs px-3 py-1.5" title="通过浏览器打印生成 PDF（所见即所得）">
+          打印PDF
         </button>
         <button onClick={handleExportSVG} className="btn-secondary text-xs px-3 py-1.5">
           SVG
