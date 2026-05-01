@@ -1,6 +1,7 @@
 "use client";
 
 import type { ResumeData, SectionKey, SectionEmphasis } from "@/types";
+import { RESUME_TOKENS } from "@/lib/templates/designTokens";
 
 interface TemplateProps {
   data: ResumeData;
@@ -9,15 +10,17 @@ interface TemplateProps {
   language: "zh" | "en";
 }
 
-const SIDEBAR_BG = "#2c3e50";
-const SIDEBAR_TEXT = "#ecf0f1";
-const SIDEBAR_TEXT_LIGHT = "#bdc3c7";
-const SIDEBAR_ACCENT = "#3498db";
-const MAIN_TEXT = "#2c3e50";
-const MAIN_TEXT_SECONDARY = "#555555";
-const MAIN_TEXT_MUTED = "#7f8c8d";
-const MAIN_BORDER = "#e0e4e8";
-const SECTION_LINE = "#3498db";
+const TOKENS = RESUME_TOKENS;
+const C = RESUME_TOKENS.colors;
+const SIDEBAR_BG = C.modernSidebar;
+const SIDEBAR_TEXT = C.modernSidebarText;
+const SIDEBAR_TEXT_LIGHT = C.modernSidebarMuted;
+const SIDEBAR_ACCENT = C.accentBlue;
+const MAIN_TEXT = C.text;
+const MAIN_TEXT_SECONDARY = C.textSecondary;
+const MAIN_TEXT_MUTED = C.textMuted;
+const MAIN_BORDER = C.lineSubtle;
+const SECTION_LINE = C.accentBlue;
 
 const SECTION_LABELS: Record<SectionKey, { zh: string; en: string }> = {
   personalInfo: { zh: "基本信息", en: "Personal Info" },
@@ -141,7 +144,7 @@ export function ModernTemplate({
   };
 
   const renderSidebarSkills = () => {
-    if (data.skills.length === 0) return null;
+    if (emphasis.skills === "hidden" || data.skills.length === 0) return null;
     return (
       <div>
         <div
@@ -149,9 +152,9 @@ export function ModernTemplate({
             fontSize: "13px",
             fontWeight: 700,
             color: SIDEBAR_TEXT,
-            marginBottom: "8px",
-            paddingBottom: "4px",
-            borderBottom: `2px solid ${SIDEBAR_ACCENT}`,
+            marginBottom: `${TOKENS.spacing.sectionTitleBottom}px`,
+            paddingBottom: "3px",
+            borderBottom: `${TOKENS.line.sectionStrongPx}px solid ${SIDEBAR_ACCENT}`,
           }}
         >
           {getText(SECTION_LABELS.skills)}
@@ -186,12 +189,12 @@ export function ModernTemplate({
   const renderMainSectionHeader = (sectionKey: SectionKey) => (
     <div
       style={{
-        fontSize: "13px",
+        fontSize: `${TOKENS.fontSize.sectionTitle}px`,
         fontWeight: 700,
         color: MAIN_TEXT,
-        marginBottom: "6px",
+        marginBottom: `${TOKENS.spacing.sectionTitleBottom}px`,
         paddingBottom: "3px",
-        borderBottom: `2px solid ${SECTION_LINE}`,
+        borderBottom: `${TOKENS.line.sectionStrongPx}px solid ${SECTION_LINE}`,
         display: "flex",
         alignItems: "center",
         gap: "6px",
@@ -266,6 +269,18 @@ export function ModernTemplate({
                   {edu.courses.join(" · ")}
                 </div>
               )}
+              {getText(edu.description) && (
+                <div
+                  style={{
+                    fontSize: `${TOKENS.fontSize.meta}px`,
+                    color: MAIN_TEXT_SECONDARY,
+                    marginTop: `${TOKENS.spacing.paragraphTop}px`,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {getText(edu.description)}
+                </div>
+              )}
             </div>
           );
         })}
@@ -280,42 +295,46 @@ export function ModernTemplate({
         {renderMainSectionHeader("honors")}
         {data.honors.map((honor) => {
           return (
-            <div
-              key={honor.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "baseline",
-                marginBottom: "4px",
-                fontSize: "11px",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <span style={{ fontWeight: 600, color: MAIN_TEXT }}>
-                  {getText(honor.title)}
-                </span>
-                {honor.level && (
-                  <span
-                    style={{
-                      fontSize: "9px",
-                      color: "#7f8c8d",
-                      fontWeight: 600,
-                      flexShrink: 0,
-                    }}
-                  >
-                    [{honor.level}]
-                  </span>
-                )}
-              </div>
-              <span
+            <div key={honor.id} style={{ marginBottom: "4px", fontSize: `${TOKENS.fontSize.body}px` }}>
+              <div
                 style={{
-                  fontSize: "10px",
-                  color: MAIN_TEXT_MUTED,
-                  flexShrink: 0,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
                 }}
               >
-                {honor.period}
-              </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ fontWeight: 600, color: MAIN_TEXT }}>
+                    {getText(honor.title)}
+                  </span>
+                  {honor.level && (
+                    <span
+                      style={{
+                        fontSize: "9px",
+                        color: MAIN_TEXT_MUTED,
+                        fontWeight: 600,
+                        flexShrink: 0,
+                      }}
+                    >
+                      [{honor.level}]
+                    </span>
+                  )}
+                </div>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    color: MAIN_TEXT_MUTED,
+                    flexShrink: 0,
+                  }}
+                >
+                  {honor.period}
+                </span>
+              </div>
+              {getText(honor.description) && (
+                <div style={{ fontSize: `${TOKENS.fontSize.meta}px`, color: MAIN_TEXT_SECONDARY, lineHeight: 1.6, marginTop: `${TOKENS.spacing.paragraphTop}px` }}>
+                  {getText(honor.description)}
+                </div>
+              )}
             </div>
           );
         })}
@@ -376,6 +395,11 @@ export function ModernTemplate({
                 {exp.period}
               </span>
             </div>
+            {getText(exp.description) && (
+              <div style={{ fontSize: "10.5px", color: MAIN_TEXT_SECONDARY, lineHeight: 1.6, marginTop: "2px" }}>
+                {getText(exp.description)}
+              </div>
+            )}
             {exp.highlights && exp.highlights.length > 0 && (
               <ul
                 style={{
@@ -450,6 +474,11 @@ export function ModernTemplate({
                 {proj.period}
               </span>
             </div>
+            {proj.link && (
+              <div style={{ fontSize: "10px", color: MAIN_TEXT_MUTED, marginTop: "1px" }}>
+                {proj.link}
+              </div>
+            )}
             {proj.tech && proj.tech.length > 0 && (
               <div
                 style={{
@@ -525,6 +554,11 @@ export function ModernTemplate({
                 {act.period}
               </span>
             </div>
+            {getText(act.description) && (
+              <div style={{ fontSize: "10.5px", color: MAIN_TEXT_SECONDARY, lineHeight: 1.6, marginTop: "2px" }}>
+                {getText(act.description)}
+              </div>
+            )}
             {act.highlights && act.highlights.length > 0 && (
               <ul
                 style={{
@@ -546,7 +580,6 @@ export function ModernTemplate({
     );
   };
 
-  const sidebarSections: SectionKey[] = ["personalInfo", "skills"];
   const mainSections: SectionKey[] = [
     "education",
     "honors",
@@ -568,24 +601,18 @@ export function ModernTemplate({
     campusActivities: renderCampusActivities,
   };
 
-  const visibleSidebarSections = sidebarSections.filter(
-    (key) => emphasis[key] !== "hidden"
-  );
+  const visibleSidebarSections: SectionKey[] = ["personalInfo", ...(emphasis.skills === "hidden" ? [] : (["skills"] as SectionKey[]))];
   const visibleMainSections = sectionOrder.filter(
     (key) =>
       mainSections.includes(key) &&
-      (key === "education" || emphasis[key] !== "hidden")
+      emphasis[key] !== "hidden"
   );
-  if (visibleMainSections.length === 0) {
-    const fallback = mainSections.filter((k) => emphasis[k] !== "hidden");
-    visibleMainSections.push(...fallback);
-  }
 
   return (
     <div
       style={{
-        width: "210mm",
-        minHeight: "297mm",
+        width: `${TOKENS.page.widthPx}px`,
+        minHeight: `${TOKENS.page.minHeightPx}px`,
         fontFamily: "system-ui, -apple-system, sans-serif",
         lineHeight: 1.5,
         display: "flex",
@@ -612,7 +639,7 @@ export function ModernTemplate({
       <div
         style={{
           width: "70%",
-          padding: "24px 24px 20px",
+          padding: `${TOKENS.page.padding.modern.top}px ${TOKENS.page.padding.modern.right}px ${TOKENS.page.padding.modern.bottom}px ${TOKENS.page.padding.modern.left}px`,
         }}
       >
         {visibleMainSections.map((key) => (

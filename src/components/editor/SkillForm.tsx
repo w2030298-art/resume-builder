@@ -2,6 +2,7 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 import t from "@/lib/i18n";
+import { TagInput } from "@/components/ui/TagInput";
 
 export function SkillForm() {
   const { data, addSkillCategory, updateSkillCategory, removeSkillCategory } = useResumeStore();
@@ -55,16 +56,13 @@ export function SkillForm() {
             </div>
           </div>
 
-          <div>
-            <label className="field-label">{t("skills.items")}</label>
-            <input
-              type="text"
-              value={cat.items.join(", ")}
-              onChange={(e) => updateSkillCategory(cat.id, { items: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
-              className="field-input"
-              placeholder="React, TypeScript, Vue, ..."
-            />
-          </div>
+          <TagInput
+            label={t("skills.items") === "skills.items" ? "技能项" : t("skills.items")}
+            value={cat.items}
+            onChange={(items) => updateSkillCategory(cat.id, { items })}
+            placeholder="例如：TypeScript / Next.js / PostgreSQL"
+            emptyText="暂无技能项，点击添加一项"
+          />
         </div>
       ))}
     </div>

@@ -5,7 +5,7 @@ export default defineConfig({
   timeout: 60_000,
   retries: 1,
   use: {
-    baseURL: process.env.APP_URL || "http://localhost:3000",
+    baseURL: process.env.APP_URL || "http://localhost:3001",
     headless: true,
     viewport: { width: 1440, height: 900 },
     ignoreHTTPSErrors: true,

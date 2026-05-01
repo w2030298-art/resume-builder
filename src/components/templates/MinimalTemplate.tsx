@@ -1,6 +1,7 @@
 "use client";
 
 import type { ResumeData, SectionKey, SectionEmphasis } from "@/types";
+import { RESUME_TOKENS } from "@/lib/templates/designTokens";
 
 interface TemplateProps {
   data: ResumeData;
@@ -10,7 +11,14 @@ interface TemplateProps {
 }
 
 const FONT = "system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif";
-const C = { text: "#1a1a1a", secondary: "#666", muted: "#999", line: "#bbb", bg: "#fff" };
+const TOKENS = RESUME_TOKENS;
+const C = {
+  text: TOKENS.colors.text,
+  secondary: TOKENS.colors.textSecondary,
+  muted: TOKENS.colors.textMuted,
+  line: TOKENS.colors.line,
+  bg: "#fff",
+};
 
 export function MinimalTemplate({ data, sectionOrder, emphasis, language }: TemplateProps) {
   const getText = (b: { zh: string; en: string } | undefined | null) =>
@@ -32,7 +40,7 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
 
   function SectionHeader({ label }: { label: string }) {
     return (
-      <div style={{ marginTop: 16 }}>
+      <div style={{ marginTop: TOKENS.spacing.sectionTop }}>
         <div
           style={{
             height: "1px",
@@ -42,7 +50,7 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
         />
         <div
           style={{
-            fontSize: 13,
+            fontSize: TOKENS.fontSize.sectionTitle,
             fontWeight: 700,
             color: C.text,
             letterSpacing: "0.02em",
@@ -165,6 +173,11 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
                   {details.join("; ")}
                 </div>
               )}
+              {getText(edu.description) && (
+                <div style={{ fontSize: 10, color: C.muted, marginTop: TOKENS.spacing.paragraphTop, lineHeight: 1.5 }}>
+                  {getText(edu.description)}
+                </div>
+              )}
             </div>
           );
         })}
@@ -208,7 +221,6 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
 
   function renderExperience() {
     if (data.experience.length === 0) return null;
-    const isCompact = emphasis.experience === "compact";
     return (
       <div>
         <SectionHeader label={language === "zh" ? "实习经历" : "Experience"} />
@@ -228,7 +240,7 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
                   {exp.period}
                 </span>
               </div>
-              {getText(exp.description) && !isCompact && (
+              {getText(exp.description) && (
                 <div style={{ fontSize: 10, color: C.muted, marginTop: 2, lineHeight: 1.6 }}>
                   {getText(exp.description)}
                 </div>
@@ -279,6 +291,11 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
               {proj.tech && proj.tech.length > 0 && (
                 <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>
                   Tech: {proj.tech.join(", ")}
+                </div>
+              )}
+              {proj.link && (
+                <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>
+                  {proj.link}
                 </div>
               )}
               {getText(proj.description) && (
@@ -359,7 +376,7 @@ export function MinimalTemplate({ data, sectionOrder, emphasis, language }: Temp
   return (
     <div
       style={{
-        padding: "24px 32px",
+        padding: `${TOKENS.page.padding.minimal.top}px ${TOKENS.page.padding.minimal.right}px ${TOKENS.page.padding.minimal.bottom}px ${TOKENS.page.padding.minimal.left}px`,
         fontFamily: FONT,
         lineHeight: 1.5,
         color: C.text,

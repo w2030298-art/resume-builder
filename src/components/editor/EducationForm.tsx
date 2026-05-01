@@ -2,6 +2,7 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 import t from "@/lib/i18n";
+import { TagInput } from "@/components/ui/TagInput";
 
 export function EducationForm() {
   const { data, addEducation, updateEducation, removeEducation } = useResumeStore();
@@ -123,13 +124,12 @@ export function EducationForm() {
           </div>
 
           <div className="mb-3">
-            <label className="field-label">{t("education.courses")}</label>
-            <input
-              type="text"
-              value={edu.courses.join(", ")}
-              onChange={(e) => updateEducation(edu.id, { courses: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
-              className="field-input"
-              placeholder={t("education.coursesPlaceholder")}
+            <TagInput
+              label={t("education.courses")}
+              value={edu.courses}
+              onChange={(courses) => updateEducation(edu.id, { courses })}
+              placeholder="例如：数据结构 / 计算机网络 / 操作系统"
+              emptyText="暂无课程，点击添加一项"
             />
           </div>
 

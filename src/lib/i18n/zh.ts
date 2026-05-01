@@ -15,6 +15,19 @@ export const zh = {
     save: '保存',
     reset: '重置',
   },
+  common: {
+    addItem: '添加一项',
+    delete: '删除',
+    empty: '暂无条目',
+  },
+  layout: {
+    title: '展示设置',
+    description: '隐藏模块不会删除已填写内容，只影响简历展示和导出。',
+    show: '显示',
+    hide: '隐藏',
+    visible: '已显示',
+    hidden: '已隐藏',
+  },
   sections: {
     personalInfo: '基本信息',
     education: '教育背景',
@@ -123,6 +136,11 @@ export const zh = {
   export: {
     title: '导出',
     pdf: '导出 PDF',
+    oneClickPdf: '一键导出 PDF',
+    pdfGenerating: '正在生成 PDF...',
+    pdfSuccess: 'PDF 已导出',
+    pdfFallback: '打印方式导出',
+    pdfFailedUsePrint: '一键 PDF 导出失败，请尝试打印方式导出',
     svg: '导出 SVG',
     json: '导出 JSON',
     importJson: '导入 JSON',

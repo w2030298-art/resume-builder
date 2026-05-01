@@ -2,6 +2,7 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 import t from "@/lib/i18n";
+import { BilingualListInput } from "@/components/ui/BilingualListInput";
 
 export function CampusActivityForm() {
   const { data, addCampusActivity, updateCampusActivity, removeCampusActivity } = useResumeStore();
@@ -109,53 +110,14 @@ export function CampusActivityForm() {
             />
           </div>
 
-          <div>
-            <label className="field-label">{t("campusActivities.highlights")}</label>
-            {act.highlights.map((h, hi) => (
-              <div key={hi} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={h.zh}
-                  onChange={(e) => {
-                    const newHighlights = [...act.highlights];
-                    newHighlights[hi] = { ...newHighlights[hi], zh: e.target.value };
-                    updateCampusActivity(act.id, { highlights: newHighlights });
-                  }}
-                  className="field-input flex-1"
-                  placeholder="成果（中文）"
-                />
-                <input
-                  type="text"
-                  value={h.en}
-                  onChange={(e) => {
-                    const newHighlights = [...act.highlights];
-                    newHighlights[hi] = { ...newHighlights[hi], en: e.target.value };
-                    updateCampusActivity(act.id, { highlights: newHighlights });
-                  }}
-                  className="field-input flex-1"
-                  placeholder="Achievement (English)"
-                />
-                <button
-                  onClick={() => {
-                    const newHighlights = act.highlights.filter((_, i) => i !== hi);
-                    updateCampusActivity(act.id, { highlights: newHighlights });
-                  }}
-                  className="btn-danger text-xs px-2 shrink-0"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              onClick={() => {
-                const newHighlights = [...act.highlights, { zh: "", en: "" }];
-                updateCampusActivity(act.id, { highlights: newHighlights });
-              }}
-              className="btn-secondary text-xs"
-            >
-              + {t("campusActivities.addHighlight")}
-            </button>
-          </div>
+          <BilingualListInput
+            label="经历亮点"
+            value={act.highlights}
+            onChange={(highlights) => updateCampusActivity(act.id, { highlights })}
+            zhPlaceholder="例如：组织校级活动，覆盖 500+ 名同学"
+            enPlaceholder="e.g. Organized campus events for 500+ students"
+            addButtonLabel={`+ ${t("campusActivities.addHighlight")}`}
+          />
         </div>
       ))}
     </div>

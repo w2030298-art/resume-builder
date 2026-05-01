@@ -1,15 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import { useResumeStore } from "@/store/useResumeStore";
 import { SidebarEditor } from "@/components/editor/SidebarEditor";
 import { PreviewPanel } from "@/components/preview/PreviewPanel";
 import { ExportBar } from "@/components/export/ExportBar";
-import t from "@/lib/i18n";
+import t, { setLocale } from "@/lib/i18n";
 import { TEMPLATE_NAMES } from "@/types";
 import type { TemplateName } from "@/types";
 
 export default function Home() {
   const { activeLanguage, setActiveLanguage, template, setTemplate } = useResumeStore();
+
+  useEffect(() => {
+    setLocale(activeLanguage);
+  }, [activeLanguage]);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-[var(--color-bg-secondary)]">
@@ -40,7 +45,11 @@ export default function Home() {
           </div>
 
           <button
-            onClick={() => setActiveLanguage(activeLanguage === "zh" ? "en" : "zh")}
+            onClick={() => {
+              const next = activeLanguage === "zh" ? "en" : "zh";
+              setActiveLanguage(next);
+              setLocale(next);
+            }}
             className="text-xs px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)] hover:text-[var(--color-text)] transition-all font-medium"
           >
             {activeLanguage === "zh" ? "EN" : "中文"}

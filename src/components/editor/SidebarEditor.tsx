@@ -10,6 +10,7 @@ import { ExperienceForm } from "./ExperienceForm";
 import { ProjectForm } from "./ProjectForm";
 import { CampusActivityForm } from "./CampusActivityForm";
 import { SkillForm } from "./SkillForm";
+import { LayoutControls } from "./LayoutControls";
 
 const SECTIONS: SectionKey[] = ["personalInfo", "education", "honors", "experience", "projects", "campusActivities", "skills"];
 
@@ -73,6 +74,7 @@ export function SidebarEditor() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-4">
+        <LayoutControls />
         {renderSection()}
       </div>
     </div>

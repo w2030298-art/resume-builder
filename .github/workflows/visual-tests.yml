@@ -15,9 +15,9 @@ jobs:
       node:
         image: node:20
         ports:
-          - 3000:3000
+          - 3001:3001
         options: >-
-          --health-cmd "curl --silent http://localhost:3000 || exit 1"
+          --health-cmd "curl --silent http://localhost:3001 || exit 1"
           --health-interval 30s
           --health-timeout 10s
           --health-retries 5
@@ -46,14 +46,14 @@ jobs:
       - name: Start application
         run: npm start &
         env:
-          TEST_URL: http://localhost:3000
+          TEST_URL: http://localhost:3001
           NODE_ENV: production
-          PORT: 3000
+          PORT: 3001
       
       - name: Wait for application to be ready
         run: |
           for i in {1..30}; do
-            curl -s http://localhost:3000 > /dev/null && break
+            curl -s http://localhost:3001 > /dev/null && break
             sleep 2
           done
       
@@ -61,7 +61,7 @@ jobs:
         run: npm run test:visual
         env:
           APPLITOOLS_API_KEY: ${{ secrets.APPLITOOLS_API_KEY }}
-          TEST_URL: http://localhost:3000
+          TEST_URL: http://localhost:3001
       
       - name: Upload test results
         if: always()

@@ -2,6 +2,7 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 import t from "@/lib/i18n";
+import { BilingualListInput } from "@/components/ui/BilingualListInput";
 
 export function ExperienceForm() {
   const { data, addExperience, updateExperience, removeExperience } = useResumeStore();
@@ -111,53 +112,14 @@ export function ExperienceForm() {
             />
           </div>
 
-          <div>
-            <label className="field-label">{t("experience.highlights")}</label>
-            {exp.highlights.map((h, hi) => (
-              <div key={hi} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={h.zh}
-                  onChange={(e) => {
-                    const newHighlights = [...exp.highlights];
-                    newHighlights[hi] = { ...newHighlights[hi], zh: e.target.value };
-                    updateExperience(exp.id, { highlights: newHighlights });
-                  }}
-                  className="field-input flex-1"
-                  placeholder="成果（中文）"
-                />
-                <input
-                  type="text"
-                  value={h.en}
-                  onChange={(e) => {
-                    const newHighlights = [...exp.highlights];
-                    newHighlights[hi] = { ...newHighlights[hi], en: e.target.value };
-                    updateExperience(exp.id, { highlights: newHighlights });
-                  }}
-                  className="field-input flex-1"
-                  placeholder="Achievement (English)"
-                />
-                <button
-                  onClick={() => {
-                    const newHighlights = exp.highlights.filter((_, i) => i !== hi);
-                    updateExperience(exp.id, { highlights: newHighlights });
-                  }}
-                  className="btn-danger text-xs px-2 shrink-0"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              onClick={() => {
-                const newHighlights = [...exp.highlights, { zh: "", en: "" }];
-                updateExperience(exp.id, { highlights: newHighlights });
-              }}
-              className="btn-secondary text-xs"
-            >
-              + {t("experience.addHighlight")}
-            </button>
-          </div>
+          <BilingualListInput
+            label="工作亮点"
+            value={exp.highlights}
+            onChange={(highlights) => updateExperience(exp.id, { highlights })}
+            zhPlaceholder="例如：负责核心页面开发，提升转化率 15%"
+            enPlaceholder="e.g. Built core pages and improved conversion by 15%"
+            addButtonLabel={`+ ${t("experience.addHighlight")}`}
+          />
         </div>
       ))}
     </div>

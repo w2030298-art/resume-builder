@@ -33,14 +33,16 @@ export function ExportBar() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "resume.pdf";
+      const safeName = store.data.personalInfo.name.zh || store.data.personalInfo.name.en || "resume";
+      a.download = `${safeName}-resume.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      showFeedback(t("export.pdfSuccess"));
     } catch (err) {
       console.error("PDF export failed:", err);
-      showFeedback("PDF 导出失败");
+      showFeedback(t("export.pdfFailedUsePrint"));
     } finally {
       setExporting(null);
     }
@@ -111,10 +113,10 @@ export function ExportBar() {
           disabled={exporting === "pdf"}
           className="btn-primary text-xs px-3 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {exporting === "pdf" ? "生成中..." : "PDF"}
+          {exporting === "pdf" ? t("export.pdfGenerating") : t("export.oneClickPdf")}
         </button>
-        <button onClick={handleBrowserPrint} className="btn-secondary text-xs px-3 py-1.5" title="通过浏览器打印生成 PDF（所见即所得）">
-          打印PDF
+        <button onClick={handleBrowserPrint} className="btn-secondary text-xs px-3 py-1.5" title="如果一键导出效果异常，可使用浏览器打印作为备用方案">
+          {t("export.pdfFallback")}
         </button>
         <button onClick={handleExportSVG} className="btn-secondary text-xs px-3 py-1.5">
           SVG

@@ -1,0 +1,89 @@
+# 问题记录
+
+> Codex 在执行中遇到 plan.md 未覆盖的情况时记录于此。本文件当前先记录补建基线时发现的已知问题。
+
+## 已知问题
+
+### I-1：视觉测试文件不可作为当前验收依据
+- **位置**：`tests/visual.test.js`
+- **类型**：测试链路 / 视觉验收
+- **现象**：
+  - 导入包名存在明显拼写错误。
+  - Applitools 包名存在明显拼写错误。
+  - 文件中存在语法错误。
+  - 部分等待状态字符串拼写错误。
+  - 测试路由假设与当前 App Router 页面结构不一致。
+- **影响**：
+  - `npm run test:visual` 大概率无法稳定执行。
+  - 后续 UI/模板优化缺少可靠视觉回归基线。
+- **建议处理**：
+  - 在下一轮 `plan-patch.md` 中先重建 Playwright 截图测试。
+  - 不依赖 Applitools 作为必需项，优先使用本地 screenshot snapshot 作为默认验收。
+  - 覆盖 4 个模板 × 中英文 × 核心编辑器交互。
+
+### I-2：分隔字段输入体验不佳
+- **位置**：
+  - `src/components/editor/EducationForm.tsx`
+  - `src/components/editor/ProjectForm.tsx`
+  - `src/components/editor/SkillForm.tsx`
+  - 可能还包括经历/校园经历的 highlights 字段
+- **类型**：UX / 数据输入
+- **现象**：
+  - 用户需要在单个 input 中用逗号分割多个字段。
+  - 输入、删除、重排单项不直观。
+- **影响**：
+  - 用户容易输入错误分隔符。
+  - Web 表单与简历中“竖线/点号/分隔符展示”的关系不直观。
+- **建议处理**：
+  - 新增通用 `TagInput` / `ListInput` 组件。
+  - 每个条目作为独立 chip 或独立 input 行展示。
+  - 内部仍保存为 `string[]`，保持数据模型兼容。
+
+### I-3：模块展示控制缺少 UI
+- **位置**：
+  - `src/store/useResumeStore.ts`
+  - `src/components/editor/SidebarEditor.tsx`
+  - `src/components/templates/*Template.tsx`
+- **类型**：UX / 布局控制
+- **现象**：
+  - store 已有 `setEmphasis` 和 `SectionEmphasis.hidden`。
+  - 模板已部分读取 `emphasis.hidden`。
+  - 用户没有可操作 UI 控制模块显示/隐藏。
+- **影响**：
+  - 用户填写了信息后，不能自行决定模块是否展示。
+  - 部分“填了但不想显示”的情况无解。
+- **建议处理**：
+  - 新增 `LayoutControls` 组件。
+  - 提供每个模块的显示/隐藏开关。
+  - 不允许隐藏 `personalInfo`，除非产品明确允许。
+
+### I-4：Web 模板与 PDF 模板样式双实现导致视觉漂移
+- **位置**：
+  - `src/components/templates/*Template.tsx`
+  - `src/lib/export/pdf.tsx`
+- **类型**：导出一致性 / 视觉体验
+- **现象**：
+  - Web 预览模板和 React PDF 模板分别维护样式。
+  - 横线颜色、粗细、间距、字号、模块间距存在漂移风险。
+- **影响**：
+  - 用户看到的 Web 预览可能和下载 PDF 不一致。
+  - 后续微调排版成本较高。
+- **建议处理**：
+  - 抽取模板设计 token，例如 `src/lib/templates/designTokens.ts`。
+  - Web 和 PDF 各自消费同名 token。
+  - 对关键模板建立截图对比验收。
+
+### I-5：部分已采集字段未在模板中完整展示
+- **位置**：
+  - `src/components/templates/*Template.tsx`
+  - `src/lib/export/pdf.tsx`
+- **类型**：功能完整性 / 用户预期
+- **现象**：
+  - 例如项目链接 `Project.link` 已在表单中采集，但部分模板未展示。
+  - 教育/荣誉/项目/经历的 description/highlights 在不同模板中的展示策略不完全一致。
+- **影响**：
+  - 用户认为字段“填了没用”。
+- **建议处理**：
+  - 建立字段展示矩阵。
+  - 每个模板明确展示哪些字段。
+  - 提供模块/字段级显示控制或统一默认展示策略。

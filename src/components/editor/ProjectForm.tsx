@@ -2,6 +2,7 @@
 
 import { useResumeStore } from "@/store/useResumeStore";
 import t from "@/lib/i18n";
+import { TagInput } from "@/components/ui/TagInput";
 
 export function ProjectForm() {
   const { data, addProject, updateProject, removeProject } = useResumeStore();
@@ -87,16 +88,16 @@ export function ProjectForm() {
                 placeholder="2023.09 - 2024.01"
               />
             </div>
-            <div>
-              <label className="field-label">{t("projects.tech")}</label>
-              <input
-                type="text"
-                value={proj.tech.join(", ")}
-                onChange={(e) => updateProject(proj.id, { tech: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
-                className="field-input"
-                placeholder="React, TypeScript, Node.js"
-              />
-            </div>
+          </div>
+
+          <div className="mb-3">
+            <TagInput
+              label={t("projects.tech")}
+              value={proj.tech}
+              onChange={(tech) => updateProject(proj.id, { tech })}
+              placeholder="例如：React / TypeScript / Node.js"
+              emptyText="暂无技术栈，点击添加一项"
+            />
           </div>
 
           <div className="mb-3">

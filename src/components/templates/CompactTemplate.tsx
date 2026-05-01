@@ -1,6 +1,7 @@
 "use client";
 
 import type { ResumeData, SectionKey, SectionEmphasis } from "@/types";
+import { RESUME_TOKENS } from "@/lib/templates/designTokens";
 
 interface TemplateProps {
   data: ResumeData;
@@ -8,6 +9,9 @@ interface TemplateProps {
   emphasis: Partial<Record<SectionKey, SectionEmphasis>>;
   language: "zh" | "en";
 }
+
+const TOKENS = RESUME_TOKENS;
+const C = RESUME_TOKENS.colors;
 
 export function CompactTemplate({ data, sectionOrder, emphasis, language }: TemplateProps) {
   const getText = (b: { zh: string; en: string } | undefined | null) =>
@@ -26,13 +30,13 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
   const renderSectionHeader = (label: string) => (
     <div
       style={{
-        borderLeft: "2.5px solid #2563eb",
+        borderLeft: `${TOKENS.line.sectionStrongPx}px solid ${C.accentBlue}`,
         paddingLeft: "8px",
-        marginTop: "8px",
+        marginTop: `${TOKENS.spacing.sectionTop - 4}px`,
         marginBottom: "4px",
-        fontSize: "11px",
+        fontSize: `${TOKENS.fontSize.sectionTitle - 2}px`,
         fontWeight: 700,
-        color: "#1a1a1a",
+        color: C.text,
         lineHeight: 1.3,
       }}
     >
@@ -59,16 +63,16 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
     return (
       <div style={{ marginBottom: "6px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-          <span style={{ fontSize: "18px", fontWeight: 700, color: "#1a1a1a", lineHeight: 1.3 }}>{name}</span>
-          {title && <span style={{ fontSize: "12px", fontWeight: 400, color: "#555" }}>{title}</span>}
+          <span style={{ fontSize: "18px", fontWeight: 700, color: C.text, lineHeight: 1.3 }}>{name}</span>
+          {title && <span style={{ fontSize: "12px", fontWeight: 400, color: C.textSecondary }}>{title}</span>}
         </div>
         {contactParts.length > 0 && (
-          <div style={{ fontSize: "10px", color: "#4a4a4a", marginTop: "2px", lineHeight: 1.4 }}>
+          <div style={{ fontSize: "10px", color: C.textSecondary, marginTop: "2px", lineHeight: 1.4 }}>
             {contactParts.join(" | ")}
           </div>
         )}
         {getText(info.summary) && (
-          <div style={{ fontSize: "10px", fontStyle: "italic", color: "#666", marginTop: "3px", lineHeight: 1.45 }}>
+          <div style={{ fontSize: "10px", fontStyle: "italic", color: C.textMuted, marginTop: "3px", lineHeight: 1.45 }}>
             {getText(info.summary)}
           </div>
         )}
@@ -90,16 +94,21 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
           return (
             <div key={edu.id} style={{ marginBottom: "4px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontWeight: 600, fontSize: "10.5px", color: "#1a1a1a" }}>
+                <span style={{ fontWeight: 600, fontSize: "10.5px", color: C.text }}>
                   {parts.join(" · ")}
                 </span>
-                <span style={{ fontSize: "10px", color: "#888", flexShrink: 0 }}>{edu.period}</span>
+                <span style={{ fontSize: "10px", color: C.textMuted, flexShrink: 0 }}>{edu.period}</span>
               </div>
               {(edu.gpa || (edu.courses && edu.courses.length > 0)) && (
-                <div style={{ fontSize: "10px", color: "#555", lineHeight: 1.4, marginTop: "1px" }}>
+                <div style={{ fontSize: "10px", color: C.textSecondary, lineHeight: 1.4, marginTop: "1px" }}>
                   {edu.gpa && <span>GPA: {edu.gpa}</span>}
                   {edu.gpa && edu.courses && edu.courses.length > 0 && <span> | </span>}
                   {edu.courses && edu.courses.length > 0 && <span>{language === "zh" ? "核心课程" : "Core"}: {edu.courses.join(", ")}</span>}
+                </div>
+              )}
+              {getText(edu.description) && (
+                <div style={{ fontSize: "10px", color: C.textSecondary, lineHeight: 1.4, marginTop: "1px" }}>
+                  {getText(edu.description)}
                 </div>
               )}
             </div>
@@ -120,7 +129,7 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
       <div style={{ marginBottom: "8px" }}>
         {renderSectionHeader(sectionLabel.honors)}
         {shortHonors ? (
-          <div style={{ fontSize: "10.5px", color: "#1a1a1a", lineHeight: 1.5 }}>
+          <div style={{ fontSize: "10.5px", color: C.text, lineHeight: 1.5 }}>
             {data.honors.map((h, i) => {
               const text = getText(h.title) + (h.level ? `[${h.level}]` : "");
               return (
@@ -135,13 +144,13 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
           data.honors.map((h) => (
             <div key={h.id} style={{ marginBottom: "2px", fontSize: "10.5px", lineHeight: 1.45 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontWeight: 600, color: "#1a1a1a" }}>
+                <span style={{ fontWeight: 600, color: C.text }}>
                   {getText(h.title)}{h.level ? ` [${h.level}]` : ""}
                 </span>
-                {h.period && <span style={{ fontSize: "10px", color: "#888" }}>{h.period}</span>}
+                {h.period && <span style={{ fontSize: "10px", color: C.textMuted }}>{h.period}</span>}
               </div>
               {getText(h.description) && (
-                <div style={{ fontSize: "10px", color: "#4a4a4a" }}>{getText(h.description)}</div>
+                <div style={{ fontSize: "10px", color: C.textSecondary }}>{getText(h.description)}</div>
               )}
             </div>
           ))
@@ -158,14 +167,19 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
         {data.experience.map((exp) => (
           <div key={exp.id} style={{ marginBottom: "4px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontWeight: 600, fontSize: "10.5px", color: "#1a1a1a" }}>
+              <span style={{ fontWeight: 600, fontSize: "10.5px", color: C.text }}>
                 {getText(exp.company)} · {getText(exp.role)}
               </span>
-              <span style={{ fontSize: "10px", color: "#888", flexShrink: 0 }}>{exp.period}</span>
+              <span style={{ fontSize: "10px", color: C.textMuted, flexShrink: 0 }}>{exp.period}</span>
             </div>
+            {getText(exp.description) && (
+              <div style={{ fontSize: "10px", color: C.textSecondary, lineHeight: 1.45, marginTop: "1px" }}>
+                {getText(exp.description)}
+              </div>
+            )}
             {exp.highlights && exp.highlights.length > 0 && (
-              <ul style={{ margin: "1px 0 0 0", paddingLeft: "14px", fontSize: "10.5px", color: "#4a4a4a" }}>
-                {exp.highlights.slice(0, 3).map((h, i) => (
+              <ul style={{ margin: "1px 0 0 0", paddingLeft: "14px", fontSize: "10.5px", color: C.textSecondary }}>
+                {exp.highlights.map((h, i) => (
                   <li key={i} style={{ lineHeight: 1.45 }}>{getText(h)}</li>
                 ))}
               </ul>
@@ -184,18 +198,23 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
         {data.projects.map((proj) => (
           <div key={proj.id} style={{ marginBottom: "4px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontWeight: 600, fontSize: "10.5px", color: "#1a1a1a" }}>
+              <span style={{ fontWeight: 600, fontSize: "10.5px", color: C.text }}>
                 {getText(proj.name)}{getText(proj.role) ? ` · ${getText(proj.role)}` : ""}
               </span>
-              <span style={{ fontSize: "10px", color: "#888", flexShrink: 0 }}>{proj.period}</span>
+              <span style={{ fontSize: "10px", color: C.textMuted, flexShrink: 0 }}>{proj.period}</span>
             </div>
             {proj.tech && proj.tech.length > 0 && (
-              <div style={{ fontSize: "9.5px", color: "#888", lineHeight: 1.4 }}>
+              <div style={{ fontSize: "9.5px", color: C.textMuted, lineHeight: 1.4 }}>
                 {language === "zh" ? "技术" : "Tech"}: {proj.tech.join(", ")}
               </div>
             )}
+            {proj.link && (
+              <div style={{ fontSize: "9px", color: C.textMuted, marginTop: "1px" }}>
+                {proj.link}
+              </div>
+            )}
             {getText(proj.description) ? (
-              <div style={{ fontSize: "10.5px", color: "#4a4a4a", lineHeight: 1.45 }}>
+              <div style={{ fontSize: "10.5px", color: C.textSecondary, lineHeight: 1.45 }}>
                 {getText(proj.description)}
               </div>
             ) : null}
@@ -213,21 +232,22 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
         {data.campusActivities.map((act) => (
           <div key={act.id} style={{ marginBottom: "4px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontWeight: 600, fontSize: "10.5px", color: "#1a1a1a" }}>
+              <span style={{ fontWeight: 600, fontSize: "10.5px", color: C.text }}>
                 {getText(act.organization)} · {getText(act.role)}
               </span>
-              <span style={{ fontSize: "10px", color: "#888", flexShrink: 0 }}>{act.period}</span>
+              <span style={{ fontSize: "10px", color: C.textMuted, flexShrink: 0 }}>{act.period}</span>
             </div>
+            {getText(act.description) && (
+              <div style={{ fontSize: "10.5px", color: C.textSecondary, lineHeight: 1.45 }}>
+                {getText(act.description)}
+              </div>
+            )}
             {act.highlights && act.highlights.length > 0 ? (
-              <ul style={{ margin: "1px 0 0 0", paddingLeft: "14px", fontSize: "10.5px", color: "#4a4a4a" }}>
-                {act.highlights.slice(0, 2).map((h, i) => (
+              <ul style={{ margin: "1px 0 0 0", paddingLeft: "14px", fontSize: "10.5px", color: C.textSecondary }}>
+                {act.highlights.map((h, i) => (
                   <li key={i} style={{ lineHeight: 1.45 }}>{getText(h)}</li>
                 ))}
               </ul>
-            ) : getText(act.description) ? (
-              <div style={{ fontSize: "10.5px", color: "#4a4a4a", lineHeight: 1.45 }}>
-                {getText(act.description)}
-              </div>
             ) : null}
           </div>
         ))}
@@ -240,11 +260,11 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
     return (
       <div style={{ marginBottom: "4px" }}>
         {renderSectionHeader(sectionLabel.skills)}
-        <div style={{ fontSize: "10.5px", color: "#1a1a1a", lineHeight: 1.6 }}>
+        <div style={{ fontSize: "10.5px", color: C.text, lineHeight: 1.6 }}>
           {data.skills.map((cat) => (
             <div key={cat.id} style={{ marginBottom: "1px" }}>
               <span style={{ fontWeight: 600 }}>{getText(cat.category)}</span>
-              <span style={{ color: "#555" }}>: {cat.items.join(", ")}</span>
+              <span style={{ color: C.textSecondary }}>: {cat.items.join(", ")}</span>
             </div>
           ))}
         </div>
@@ -269,10 +289,10 @@ export function CompactTemplate({ data, sectionOrder, emphasis, language }: Temp
   return (
     <div
       style={{
-        padding: "22px 32px",
+        padding: `${TOKENS.page.padding.compact.top}px ${TOKENS.page.padding.compact.right}px ${TOKENS.page.padding.compact.bottom}px ${TOKENS.page.padding.compact.left}px`,
         fontFamily: "system-ui, -apple-system, sans-serif",
         lineHeight: 1.45,
-        color: "#1a1a1a",
+        color: C.text,
         background: "#ffffff",
       }}
     >

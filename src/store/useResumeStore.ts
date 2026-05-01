@@ -43,6 +43,7 @@ interface ResumeState {
   setTemplate: (template: TemplateName) => void;
   setSectionOrder: (order: SectionKey[]) => void;
   setEmphasis: (emphasis: Partial<Record<SectionKey, SectionEmphasis>>) => void;
+  toggleSectionVisibility: (section: SectionKey) => void;
   setActiveLanguage: (lang: 'zh' | 'en') => void;
   setActiveSection: (section: SectionKey) => void;
   loadResumeData: (data: ResumeData) => void;
@@ -220,6 +221,17 @@ export const useResumeStore = create<ResumeState>()(
       setTemplate: (template) => set({ template }),
       setSectionOrder: (sectionOrder) => set({ sectionOrder }),
       setEmphasis: (emphasis) => set((state) => ({ emphasis: { ...state.emphasis, ...emphasis } })),
+      toggleSectionVisibility: (section) =>
+        set((state) => {
+          if (section === 'personalInfo') return {};
+          const current = state.emphasis[section];
+          return {
+            emphasis: {
+              ...state.emphasis,
+              [section]: current === 'hidden' ? 'normal' : 'hidden',
+            },
+          };
+        }),
       setActiveLanguage: (activeLanguage) => set({ activeLanguage }),
       setActiveSection: (activeSection) => set({ activeSection }),
       loadResumeData: (data) => set(() => {

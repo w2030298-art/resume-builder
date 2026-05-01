@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "eslint",
-    "test:visual": "npx playwright test tests/visual.test.js"
+    "test:visual": "playwright test tests/visual.spec.ts",
+    "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.5.1",

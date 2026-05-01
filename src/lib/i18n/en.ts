@@ -15,6 +15,19 @@ export const en: Record<string, Record<string, string>> = {
     save: 'Save',
     reset: 'Reset',
   },
+  common: {
+    addItem: 'Add item',
+    delete: 'Delete',
+    empty: 'No items yet',
+  },
+  layout: {
+    title: 'Display',
+    description: 'Hidden sections keep their data and only affect preview/export.',
+    show: 'Show',
+    hide: 'Hide',
+    visible: 'Visible',
+    hidden: 'Hidden',
+  },
   sections: {
     personalInfo: 'Personal Info',
     education: 'Education',
@@ -123,6 +136,11 @@ export const en: Record<string, Record<string, string>> = {
   export: {
     title: 'Export',
     pdf: 'Export PDF',
+    oneClickPdf: 'Export PDF',
+    pdfGenerating: 'Generating PDF...',
+    pdfSuccess: 'PDF exported',
+    pdfFallback: 'Print fallback',
+    pdfFailedUsePrint: 'PDF export failed. Try print fallback.',
     svg: 'Export SVG',
     json: 'Export JSON',
     importJson: 'Import JSON',
