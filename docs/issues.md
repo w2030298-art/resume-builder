@@ -73,6 +73,23 @@
   - Web 和 PDF 各自消费同名 token。
   - 对关键模板建立截图对比验收。
 
+### I-4-browser-print-mainline：PDF 主链路切换为浏览器打印 [Fixed]
+- **日期**：2026-05-02
+- **类型**：导出链路 / 架构决策
+- **现象**：
+  - 原 `@react-pdf/renderer` 导出与 Web 预览排版差异巨大。
+  - 浏览器打印功能通过 URL query string 传递数据，URL 过长且不稳定。
+  - `/export` 页未自动触发 `window.print()`。
+- **修复**：
+  - PDF 主按钮改为浏览器打印，通过 `sessionStorage` 传递 payload。
+  - `/export` 页从 `sessionStorage` 读取数据，渲染后自动调用 `window.print()`。
+  - React PDF 入口降级为实验功能或隐藏。
+  - 打印 CSS 修正为 A4 尺寸 `210mm × 297mm`。
+- **验证**：
+  - 主按钮打开 `/export` 时 URL 不包含 `data=`。
+  - `/export` 无 payload 时显示错误提示。
+  - 打印预览与 Web 预览基本一致。
+
 ### I-5：部分已采集字段未在模板中完整展示
 - **位置**：
   - `src/components/templates/*Template.tsx`
