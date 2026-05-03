@@ -144,6 +144,10 @@ export const en: Record<string, Record<string, string>> = {
     svg: 'Export SVG',
     json: 'Export JSON',
     importJson: 'Import JSON',
+    popupBlocked: 'Please allow popups to export PDF',
+    svgFailed: 'SVG export failed',
+    importSuccess: 'Import successful',
+    importFailed: 'Unable to parse JSON file',
   },
   templates: {
     classic: 'Classic',
@@ -158,4 +162,13 @@ export const en: Record<string, Record<string, string>> = {
     compact: 'Compact',
     hidden: 'Hidden',
   },
+  runtime: {
+    shutdown: 'Stop server',
+    shutdownTitle: 'Stopping…',
+    shutdownConfirm: 'Stop the local dev server?',
+    shutdownStarting: 'Server shutting down…',
+    shutdownFailed: 'Shutdown failed. Stop the process in your terminal manually.',
+    shutdownUnavailable: 'Unavailable in this environment.',
+  },
 };
+

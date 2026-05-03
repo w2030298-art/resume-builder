@@ -144,6 +144,10 @@ export const zh = {
     svg: '导出 SVG',
     json: '导出 JSON',
     importJson: '导入 JSON',
+    popupBlocked: '请允许弹出窗口以导出PDF',
+    svgFailed: 'SVG 导出失败',
+    importSuccess: '导入成功',
+    importFailed: '无法解析该 JSON 文件',
   },
   templates: {
     classic: '经典',
@@ -157,6 +161,14 @@ export const zh = {
     normal: '正常',
     compact: '紧凑',
     hidden: '隐藏',
+  },
+  runtime: {
+    shutdown: '关闭后台',
+    shutdownTitle: '关闭后台',
+    shutdownConfirm: '确认关闭后台进程？',
+    shutdownStarting: '后台正在关闭…',
+    shutdownFailed: '关闭失败，请手动在终端停止。',
+    shutdownUnavailable: '当前环境不可用。',
   },
 } as const;
 

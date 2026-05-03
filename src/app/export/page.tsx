@@ -14,11 +14,72 @@ interface PrintPayload {
   createdAt: number;
 }
 
+const TEMPLATE_NAMES: TemplateName[] = ["classic", "modern", "minimal", "compact"];
+const SECTION_KEYS: SectionKey[] = [
+  "personalInfo",
+  "education",
+  "honors",
+  "experience",
+  "projects",
+  "campusActivities",
+  "skills",
+];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isTemplateName(value: unknown): value is TemplateName {
+  return typeof value === "string" && (TEMPLATE_NAMES as string[]).includes(value);
+}
+
+function isLanguage(value: unknown): value is "zh" | "en" {
+  return value === "zh" || value === "en";
+}
+
+function isSectionOrder(value: unknown): value is SectionKey[] {
+  return (
+    Array.isArray(value) &&
+    value.length === SECTION_KEYS.length &&
+    value.every((item): item is SectionKey => (SECTION_KEYS as string[]).includes(item as string))
+  );
+}
+
+function isSectionEmphasisMap(value: unknown): value is Partial<Record<SectionKey, SectionEmphasis>> {
+  if (!isRecord(value)) return false;
+  return Object.entries(value).every(
+    ([key, item]) =>
+      (SECTION_KEYS as string[]).includes(key) &&
+      (item === "expanded" || item === "normal" || item === "compact" || item === "hidden"),
+  );
+}
+
+function isPrintPayload(value: unknown): value is PrintPayload {
+  if (!isRecord(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    isRecord(candidate.data) &&
+    isTemplateName(candidate.template) &&
+    isSectionOrder(candidate.sectionOrder) &&
+    isLanguage(candidate.language) &&
+    (candidate.emphasis === undefined || isSectionEmphasisMap(candidate.emphasis))
+  );
+}
+
 function readPrintPayload(): PrintPayload | null {
   try {
     const raw = sessionStorage.getItem("resume-export-payload");
     if (!raw) return null;
-    return JSON.parse(raw) as PrintPayload;
+    const parsed: unknown = JSON.parse(raw);
+    if (!isPrintPayload(parsed)) {
+      sessionStorage.removeItem("resume-export-payload");
+      return null;
+    }
+    return {
+      ...parsed,
+      emphasis: parsed.emphasis ?? {},
+      createdAt: typeof parsed.createdAt === "number" ? parsed.createdAt : Date.now(),
+    };
   } catch {
     return null;
   }

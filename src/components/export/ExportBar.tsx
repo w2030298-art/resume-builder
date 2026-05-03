@@ -5,6 +5,7 @@ import { useResumeStore } from "@/store/useResumeStore";
 import { downloadJSON, importFromJSON } from "@/lib/export/json";
 import { downloadSVG } from "@/lib/export/svg";
 import t from "@/lib/i18n";
+import { ShutdownButton } from "@/components/runtime/ShutdownButton";
 import type { ResumeData, TemplateName, SectionKey, SectionEmphasis } from "@/types/resume";
 
 interface PrintPayload {
@@ -38,7 +39,7 @@ export function ExportBar() {
     sessionStorage.setItem("resume-export-payload", JSON.stringify(payload));
     const printWindow = window.open("/export", "_blank");
     if (!printWindow) {
-      showFeedback("请允许弹出窗口以导出PDF");
+      showFeedback(t("export.popupBlocked"));
     }
   };
 
@@ -53,7 +54,7 @@ export function ExportBar() {
       });
     } catch (err) {
       console.error("SVG export failed:", err);
-      showFeedback("SVG 导出失败");
+      showFeedback(t("export.svgFailed"));
     }
   };
 
@@ -79,9 +80,9 @@ export function ExportBar() {
       const imported = importFromJSON(content);
       if (imported) {
         store.loadResumeData(imported);
-        showFeedback("导入成功");
+        showFeedback(t("export.importSuccess"));
       } else {
-        showFeedback("无法解析该 JSON 文件");
+        showFeedback(t("export.importFailed"));
       }
     };
     reader.readAsText(file);
@@ -130,8 +131,10 @@ export function ExportBar() {
       >
         {t("editor.reset")}
       </button>
+      <ShutdownButton />
 
       <input
+
         ref={fileInputRef}
         type="file"
         accept=".json"
