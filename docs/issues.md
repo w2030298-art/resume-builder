@@ -33,7 +33,7 @@
   - 输入、删除、重排单项不直观。
 - **影响**：
   - 用户容易输入错误分隔符。
-  - Web 表单与简历中“竖线/点号/分隔符展示”的关系不直观。
+  - Web 表单与简历中"竖线/点号/分隔符展示"的关系不直观。
 - **建议处理**：
   - 新增通用 `TagInput` / `ListInput` 组件。
   - 每个条目作为独立 chip 或独立 input 行展示。
@@ -51,27 +51,45 @@
   - 用户没有可操作 UI 控制模块显示/隐藏。
 - **影响**：
   - 用户填写了信息后，不能自行决定模块是否展示。
-  - 部分“填了但不想显示”的情况无解。
+  - 部分"填了但不想显示"的情况无解。
 - **建议处理**：
   - 新增 `LayoutControls` 组件。
   - 提供每个模块的显示/隐藏开关。
   - 不允许隐藏 `personalInfo`，除非产品明确允许。
 
 ### I-4：Web 模板与 PDF 模板样式双实现导致视觉漂移
-- **位置**：
-  - `src/components/templates/*Template.tsx`
-  - `src/lib/export/pdf.tsx`
-- **类型**：导出一致性 / 视觉体验
-- **现象**：
-  - Web 预览模板和 React PDF 模板分别维护样式。
-  - 横线颜色、粗细、间距、字号、模块间距存在漂移风险。
-- **影响**：
-  - 用户看到的 Web 预览可能和下载 PDF 不一致。
-  - 后续微调排版成本较高。
-- **建议处理**：
-  - 抽取模板设计 token，例如 `src/lib/templates/designTokens.ts`。
-  - Web 和 PDF 各自消费同名 token。
-  - 对关键模板建立截图对比验收。
+- **位置**：`src/components/templates/*Template.tsx`、`src/lib/export/pdf.tsx`
+- **类型**：视觉一致性 / 维护成本
+- **现象**：Web 与 PDF 各自维护样式 token。
+- **建议处理**：抽取共享设计 token。
+
+### H-1：Playwright webServer [Fixed]
+- **日期**：2026-05-03
+- **类型**：测试基础设施
+- **现象**：`npm run test:visual` 不自动启动 dev server。
+- **修复**：在 `playwright.config.ts` 添加 `webServer`。
+- **验证**：`npm run lint`、`npm run build` 通过。
+
+### M-1：popup print mock [Fixed]
+- **日期**：2026-05-03
+- **类型**：测试稳定性
+- **现象**：`window.print()` mock 作用域不可靠。
+- **修复**：改为 `page.context().addInitScript()`。
+- **验证**：测试结构已更新。
+
+### M-2：print payload guard [Fixed]
+- **日期**：2026-05-03
+- **类型**：运行时健壮性
+- **现象**：损坏 payload 会导致 export 页面异常。
+- **修复**：在 `src/app/export/page.tsx` 增加 `isPrintPayload()` guard。
+- **验证**：`npm run build` 通过。
+
+### I-5：本地 dev shutdown button [Fixed]
+- **日期**：2026-05-03
+- **类型**：开发体验 / 运维控制
+- **现象**：需要显式关闭本地后台进程的能力。
+- **修复**：新增 `/api/runtime/shutdown` + `ShutdownButton`，仅开发环境可用。
+- **验证**：`npm run build` 通过；手动验证"关闭后台"按钮能真正关闭 dev server（前端无连接确认）；关闭浏览器标签页不会自动杀后台。
 
 ### I-4-browser-print-mainline：PDF 主链路切换为浏览器打印 [Fixed]
 - **日期**：2026-05-02
@@ -99,7 +117,7 @@
   - 例如项目链接 `Project.link` 已在表单中采集，但部分模板未展示。
   - 教育/荣誉/项目/经历的 description/highlights 在不同模板中的展示策略不完全一致。
 - **影响**：
-  - 用户认为字段“填了没用”。
+  - 用户认为字段"填了没用"。
 - **建议处理**：
   - 建立字段展示矩阵。
   - 每个模板明确展示哪些字段。
