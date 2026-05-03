@@ -3,66 +3,73 @@
 import { useEffect, useState } from "react";
 import { useResumeStore } from "@/store/useResumeStore";
 import { PreviewPanel } from "@/components/preview/PreviewPanel";
+import type { ResumeData, TemplateName, SectionKey, SectionEmphasis } from "@/types";
+
+interface PrintPayload {
+  data: ResumeData;
+  template: TemplateName;
+  sectionOrder: SectionKey[];
+  emphasis: Partial<Record<SectionKey, SectionEmphasis>>;
+  language: "zh" | "en";
+  createdAt: number;
+}
+
+function readPrintPayload(): PrintPayload | null {
+  try {
+    const raw = sessionStorage.getItem("resume-export-payload");
+    if (!raw) return null;
+    return JSON.parse(raw) as PrintPayload;
+  } catch {
+    return null;
+  }
+}
 
 export default function ExportPage() {
   const [ready, setReady] = useState(false);
-  const [parseError, setParseError] = useState(false);
+  const [noPayload, setNoPayload] = useState(false);
   const { loadResumeData, setTemplate, setSectionOrder, setEmphasis, setActiveLanguage } = useResumeStore();
 
   useEffect(() => {
     document.title = "Resume Print Export";
-    const params = new URLSearchParams(window.location.search);
-    const data = params.get("data");
-    const template = params.get("template");
-    const sectionOrder = params.get("sectionOrder");
-    const emphasis = params.get("emphasis");
-    const language = params.get("language");
 
-    if (data) {
-      try {
-        loadResumeData(JSON.parse(decodeURIComponent(data)));
-      } catch (e) {
-        console.error("Failed to parse resume data:", e);
-        requestAnimationFrame(() => setParseError(true));
-      }
+    const payload = readPrintPayload();
+    if (!payload) {
+      requestAnimationFrame(() => setNoPayload(true));
+      return;
     }
-    if (template) setTemplate(template as "classic" | "modern" | "minimal" | "compact");
-    if (sectionOrder) {
-      try {
-        setSectionOrder(JSON.parse(decodeURIComponent(sectionOrder)));
-      } catch (error) {
-        console.error("Failed to parse section order:", error);
-      }
-    }
-    if (emphasis) {
-      try {
-        setEmphasis(JSON.parse(decodeURIComponent(emphasis)));
-      } catch (error) {
-        console.error("Failed to parse emphasis:", error);
-      }
-    }
-    if (language) setActiveLanguage(language as "zh" | "en");
+
+    loadResumeData(payload.data);
+    setTemplate(payload.template);
+    setSectionOrder(payload.sectionOrder);
+    setEmphasis(payload.emphasis);
+    setActiveLanguage(payload.language);
 
     requestAnimationFrame(() => {
       setReady(true);
       setTimeout(() => {
-        window.dispatchEvent(new Event("resume-export-ready"));
+        window.print();
       }, 500);
     });
+
+    const onAfterPrint = () => {
+      sessionStorage.removeItem("resume-export-payload");
+    };
+    window.addEventListener("afterprint", onAfterPrint);
+    return () => window.removeEventListener("afterprint", onAfterPrint);
   }, [loadResumeData, setTemplate, setSectionOrder, setEmphasis, setActiveLanguage]);
+
+  if (noPayload) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", fontFamily: "system-ui, sans-serif", color: "#1f2937" }}>
+        未找到导出数据，请返回主页面重新导出。
+      </div>
+    );
+  }
 
   if (!ready) {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", fontFamily: "system-ui, sans-serif", color: "#666" }}>
         Loading...
-      </div>
-    );
-  }
-
-  if (parseError) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", fontFamily: "system-ui, sans-serif", color: "#1f2937" }}>
-        无法解析简历数据，请返回主页面重新导出。
       </div>
     );
   }

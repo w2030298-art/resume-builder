@@ -193,7 +193,9 @@ select {
     margin: 0;
   }
 
-  body {
+  html, body {
+    width: 210mm;
+    min-height: 297mm;
     background: white !important;
   }
 
@@ -202,17 +204,16 @@ select {
     display: none !important;
   }
 
-  .resume-print-area {
-    box-shadow: none !important;
+  .print-container {
     margin: 0 !important;
-    width: 100% !important;
-    min-height: auto !important;
+    padding: 0 !important;
+    display: block !important;
   }
 
-  .print-container {
-    display: flex !important;
-    justify-content: center !important;
-    padding: 0 !important;
-    margin: 0 !important;
+  #resume-preview.resume-print-area {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
   }
 }

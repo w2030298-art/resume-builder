@@ -4,13 +4,20 @@ import { useState, useRef } from "react";
 import { useResumeStore } from "@/store/useResumeStore";
 import { downloadJSON, importFromJSON } from "@/lib/export/json";
 import { downloadSVG } from "@/lib/export/svg";
-import { pdf } from "@react-pdf/renderer";
-import { createResumePDF } from "@/lib/export/pdf";
 import t from "@/lib/i18n";
+import type { ResumeData, TemplateName, SectionKey, SectionEmphasis } from "@/types/resume";
+
+interface PrintPayload {
+  data: ResumeData;
+  template: TemplateName;
+  sectionOrder: SectionKey[];
+  emphasis: Partial<Record<SectionKey, SectionEmphasis>>;
+  language: "zh" | "en";
+  createdAt: number;
+}
 
 export function ExportBar() {
   const store = useResumeStore();
-  const [exporting, setExporting] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -19,32 +26,19 @@ export function ExportBar() {
     setTimeout(() => setFeedback(null), 2500);
   };
 
-  const handleExportPDF = async () => {
-    setExporting("pdf");
-    try {
-      const doc = createResumePDF({
-        data: store.data,
-        sectionOrder: store.sectionOrder,
-        emphasis: store.emphasis,
-        language: store.activeLanguage,
-        template: store.template,
-      });
-      const blob = await pdf(doc).toBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      const safeName = store.data.personalInfo.name.zh || store.data.personalInfo.name.en || "resume";
-      a.download = `${safeName}-resume.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showFeedback(t("export.pdfSuccess"));
-    } catch (err) {
-      console.error("PDF export failed:", err);
-      showFeedback(t("export.pdfFailedUsePrint"));
-    } finally {
-      setExporting(null);
+  const handlePrintPDF = () => {
+    const payload: PrintPayload = {
+      data: store.data,
+      template: store.template,
+      sectionOrder: store.sectionOrder,
+      emphasis: store.emphasis,
+      language: store.activeLanguage,
+      createdAt: Date.now(),
+    };
+    sessionStorage.setItem("resume-export-payload", JSON.stringify(payload));
+    const printWindow = window.open("/export", "_blank");
+    if (!printWindow) {
+      showFeedback("请允许弹出窗口以导出PDF");
     }
   };
 
@@ -60,14 +54,6 @@ export function ExportBar() {
     } catch (err) {
       console.error("SVG export failed:", err);
       showFeedback("SVG 导出失败");
-    }
-  };
-
-  const handleBrowserPrint = () => {
-    const printUrl = `/export?data=${encodeURIComponent(JSON.stringify(store.data))}&template=${store.template}&sectionOrder=${encodeURIComponent(JSON.stringify(store.sectionOrder))}&emphasis=${encodeURIComponent(JSON.stringify(store.emphasis))}&language=${store.activeLanguage}`;
-    const printWindow = window.open(printUrl, "_blank");
-    if (!printWindow) {
-      showFeedback("请允许弹出窗口以打印简历");
     }
   };
 
@@ -108,15 +94,8 @@ export function ExportBar() {
   return (
     <div className="no-print flex items-center gap-2 px-5 py-2 bg-[var(--color-bg-tertiary)] border-b border-[var(--color-border)]">
       <div className="flex items-center gap-1.5">
-        <button
-          onClick={handleExportPDF}
-          disabled={exporting === "pdf"}
-          className="btn-primary text-xs px-3 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {exporting === "pdf" ? t("export.pdfGenerating") : t("export.oneClickPdf")}
-        </button>
-        <button onClick={handleBrowserPrint} className="btn-secondary text-xs px-3 py-1.5" title="如果一键导出效果异常，可使用浏览器打印作为备用方案">
-          {t("export.pdfFallback")}
+        <button onClick={handlePrintPDF} className="btn-primary text-xs px-3 py-1.5">
+          {t("export.oneClickPdf")}
         </button>
         <button onClick={handleExportSVG} className="btn-secondary text-xs px-3 py-1.5">
           SVG

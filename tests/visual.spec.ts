@@ -61,14 +61,36 @@ test.describe("resume visual snapshots", () => {
   }
 });
 
-test("one click PDF export triggers download", async ({ page }) => {
+test("print export opens clean export page", async ({ page }) => {
   await resetApp(page);
 
-  const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: /一键导出 PDF|Export PDF/i }).click();
-  const download = await downloadPromise;
+  // Mock window.print to prevent actual print dialog
+  await page.addInitScript(() => {
+    window.print = () => window.dispatchEvent(new Event("resume-print-called"));
+  });
 
-  expect(download.suggestedFilename()).toMatch(/resume\.pdf$/);
+  // Click main PDF export button
+  const [newPage] = await Promise.all([
+    page.waitForEvent("popup"),
+    page.getByRole("button", { name: /导出PDF|Export PDF/i }).click(),
+  ]);
+
+  // Wait for page to load
+  await newPage.waitForLoadState("domcontentloaded");
+
+  // Assert URL is /export without data= parameter
+  expect(newPage.url()).toContain("/export");
+  expect(newPage.url()).not.toContain("data=");
+
+  // Assert resume preview is visible
+  await expect(newPage.locator("#resume-preview")).toBeVisible();
+});
+
+test("export page without payload shows error", async ({ page }) => {
+  await page.goto("/export");
+
+  // Should show error message
+  await expect(page.getByText(/未找到导出数据|No export data/i)).toBeVisible();
 });
 
 test("hide campus activities", async ({ page }) => {
