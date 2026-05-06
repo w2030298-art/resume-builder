@@ -168,6 +168,7 @@ export const en: Record<string, Record<string, string>> = {
     shutdownConfirm: 'Stop the local dev server?',
     shutdownStarting: 'Server shutting down…',
     shutdownFailed: 'Shutdown failed. Stop the process in your terminal manually.',
+    shutdownDone: 'Server stopped ✓',
     shutdownUnavailable: 'Unavailable in this environment.',
   },
 };

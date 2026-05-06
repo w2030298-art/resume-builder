@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import t from "@/lib/i18n";
 import { requestRuntimeShutdown } from "@/lib/runtime/shutdown";
 
 export function ShutdownButton() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "done" | "error">("idle");
 
   if (process.env.NODE_ENV !== "development") {
     return null;
@@ -26,8 +26,27 @@ export function ShutdownButton() {
     }
   };
 
+  // Auto-transition from "shutting down..." to "stopped" after a brief display
+  useEffect(() => {
+    if (status !== "success") return;
+    const timer = setTimeout(() => setStatus("done"), 800);
+    return () => clearTimeout(timer);
+  }, [status]);
+
+  // Close the browser tab once shutdown is confirmed.
+  // window.close() works here because the page was opened by launch.ps1's Start-Process.
+  // If the browser blocks it (manual tab), the "stopped" message remains as fallback.
+  useEffect(() => {
+    if (status !== "done") return;
+    window.close();
+  }, [status]);
+
   if (status === "success") {
     return <span className="text-xs text-[var(--color-primary)]">{t("runtime.shutdownStarting")}</span>;
+  }
+
+  if (status === "done") {
+    return <span className="text-xs text-[var(--color-muted)]">{t("runtime.shutdownDone")}</span>;
   }
 
   return (

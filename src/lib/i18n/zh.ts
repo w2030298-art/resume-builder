@@ -168,6 +168,7 @@ export const zh = {
     shutdownConfirm: '确认关闭后台进程？',
     shutdownStarting: '后台正在关闭…',
     shutdownFailed: '关闭失败，请手动在终端停止。',
+    shutdownDone: '后台已关闭 ✓',
     shutdownUnavailable: '当前环境不可用。',
   },
 } as const;
